@@ -5,23 +5,47 @@ import java.awt.event.ActionListener;
 
 public class EndScreen extends JPanel {
     private JFrame frame;
+    private String selectedMusic;
+    private String selectedPlayerSkin;
+    private String selectedEnemySkin;
+    private String difficulty;
+    private int score;
+    private HighScoreManager highScoreManager;
 
-    public EndScreen(JFrame frame) {
+    public EndScreen(JFrame frame, String selectedMusic, String selectedPlayerSkin, String selectedEnemySkin, String difficulty, int score) {
         this.frame = frame;
-        setLayout(new GridLayout(3, 1));
+        this.selectedMusic = selectedMusic;
+        this.selectedPlayerSkin = selectedPlayerSkin;
+        this.selectedEnemySkin = selectedEnemySkin;
+        this.difficulty = difficulty;
+        this.score = score;
+        this.highScoreManager = new HighScoreManager();
+        setLayout(new GridLayout(4, 1));
 
         JLabel gameOverLabel = new JLabel("Game Over!", SwingConstants.CENTER);
         gameOverLabel.setFont(new Font("Serif", Font.BOLD, 36));
         add(gameOverLabel);
 
-        JButton restartButton = new JButton("Restart");
-        restartButton.addActionListener(new ActionListener() {
+        JLabel scoreLabel = new JLabel("Your Score: " + score, SwingConstants.CENTER);
+        scoreLabel.setFont(new Font("Serif", Font.BOLD, 24));
+        add(scoreLabel);
+
+        JPanel saveScorePanel = new JPanel(new BorderLayout());
+        JTextField nameField = new JTextField();
+        JButton saveButton = new JButton("Save Score");
+        saveButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                restartGame();
+                String name = nameField.getText();
+                if (!name.isEmpty()) {
+                    highScoreManager.addHighScore(name, score);
+                    JOptionPane.showMessageDialog(frame, "Score saved!");
+                }
             }
         });
-        add(restartButton);
+        saveScorePanel.add(nameField, BorderLayout.CENTER);
+        saveScorePanel.add(saveButton, BorderLayout.EAST);
+        add(saveScorePanel);
 
         JButton mainMenuButton = new JButton("Main Menu");
         mainMenuButton.addActionListener(new ActionListener() {
@@ -31,17 +55,6 @@ public class EndScreen extends JPanel {
             }
         });
         add(mainMenuButton);
-    }
-
-    private void restartGame() {
-        frame.getContentPane().removeAll();
-        Game game = new Game("tart", "Skin1", "Skin1");
-        game.setFrame(frame);
-        frame.add(game);
-        frame.revalidate();
-        frame.repaint();
-        Thread gameThread = new Thread(game);
-        gameThread.start();
     }
 
     private void backToMainMenu() {

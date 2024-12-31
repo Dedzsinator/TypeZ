@@ -1,6 +1,6 @@
 public class StraightLineMovement implements MovementStrategy {
     @Override
     public void move(Zombie zombie) {
-        zombie.move(); // Default straight-line movement
+        zombie.moveTowards(zombie.getTargetX(), zombie.getTargetY()); // Move in a straight line towards the player
     }
 }
