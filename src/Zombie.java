@@ -12,38 +12,45 @@ public class Zombie {
     private double x, y;
     private double speed;
     private String word;
-    private String skin;
     private MovementStrategy movementStrategy;
     private String typedWord = "";
     private Animation walkAnimation;
     private Animation deathAnimation;
     private boolean isDead = false;
     private int targetX, targetY;
-    private List<GooProjectile> gooProjectiles = new ArrayList<>();
     private long spawnTime;
+    private int width;
+    private int height;
 
-    public Zombie(int x, int y, String word, double speed, String skin, MovementStrategy movementStrategy) {
+    public Zombie(int x, int y, String word, double speed, MovementStrategy movementStrategy) {
         this.x = x;
         this.y = y;
         this.word = word;
         this.speed = speed;
-        this.skin = skin;
         this.movementStrategy = movementStrategy;
-        this.walkAnimation = new Animation(100); // Example frame duration
-        this.deathAnimation = new Animation(100); // Example frame duration
-        this.deathAnimation.setLoop(false); // Death animation should not loop
+        this.walkAnimation = new Animation(100);
+        this.deathAnimation = new Animation(100);
+        this.deathAnimation.setLoop(false);
         this.spawnTime = System.currentTimeMillis();
+        this.width = 32;
+        this.height = 32;
 
-        // Load frames for the walk animation
-        List<Image> walkFrames = loadFramesFromDirectory("../res/slow_zombie");
+        List<Image> walkFrames = loadFramesFromDirectory(getWalkAnimationDirectory());
         for (Image frame : walkFrames) {
             walkAnimation.addFrame(frame);
         }
 
-        // Load frames for the death animation
         List<Image> deathFrames = loadFramesFromDirectory("../res/dead_zombie");
         for (Image frame : deathFrames) {
             deathAnimation.addFrame(frame);
+        }
+    }
+
+    private String getWalkAnimationDirectory() {
+        if (movementStrategy instanceof ZigZagMovement) {
+            return "../res/fast_zombie";
+        } else {
+            return "../res/slow_zombie";
         }
     }
 
@@ -79,9 +86,19 @@ public class Zombie {
 
     public void move() {
         movementStrategy.move(this);
-        for (GooProjectile goo : gooProjectiles) {
-            goo.update();
-        }
+    }
+
+    public void update() {
+        move();
+    }
+
+    public boolean collidesWith(Player player) {
+        int playerX = player.getX();
+        int playerY = player.getY();
+        int playerWidth = 50;
+        int playerHeight = 50;
+
+        return getX() >= playerX && getX() <= playerX + playerWidth && getY() >= playerY && getY() <= playerY + playerHeight;
     }
 
     public void draw(Graphics g) {
@@ -97,15 +114,11 @@ public class Zombie {
             g.drawImage(currentFrame, (int) x, (int) y, null);
         }
         g.setColor(Color.BLACK);
-        g.setFont(new Font("Arial", Font.BOLD, 24)); // Set font size and style
+        g.setFont(new Font("Arial", Font.BOLD, 24));
         g.drawString(word, (int) x + 10, (int) y + 30);
         g.setColor(Color.RED);
         g.drawString(typedWord, (int) x + 10, (int) y + 45);
 
-        // Draw goo projectiles
-        for (GooProjectile goo : gooProjectiles) {
-            goo.draw(g);
-        }
     }
 
     public int getY() {
@@ -159,10 +172,6 @@ public class Zombie {
         return speed;
     }
 
-    public String getSkin() {
-        return skin;
-    }
-
     public int getTargetX() {
         return targetX;
     }
@@ -180,19 +189,19 @@ public class Zombie {
         return deathAnimation;
     }
 
-    public List<GooProjectile> getGooProjectiles() {
-        return gooProjectiles;
-    }
-
-    public void setGooProjectiles(List<GooProjectile> gooProjectiles) {
-        this.gooProjectiles = gooProjectiles;
-    }
-
     public long getSpawnTime() {
         return spawnTime;
     }
 
     public MovementStrategy getMovementStrategy() {
         return movementStrategy;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
     }
 }

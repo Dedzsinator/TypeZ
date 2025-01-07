@@ -7,39 +7,41 @@ public class EndScreen extends JPanel {
     private JFrame frame;
     private String selectedMusic;
     private String selectedPlayerSkin;
-    private String selectedEnemySkin;
+    private String selectedGunSkin;
     private String difficulty;
-    private int score;
     private HighScoreManager highScoreManager;
 
-    public EndScreen(JFrame frame, String selectedMusic, String selectedPlayerSkin, String selectedEnemySkin, String difficulty, int score) {
+    public EndScreen(JFrame frame, String selectedMusic, String selectedPlayerSkin, String selectedGunSkin, String difficulty, int score, int maxWave) {
         this.frame = frame;
         this.selectedMusic = selectedMusic;
         this.selectedPlayerSkin = selectedPlayerSkin;
-        this.selectedEnemySkin = selectedEnemySkin;
+        this.selectedGunSkin = selectedGunSkin;
         this.difficulty = difficulty;
-        this.score = score;
         this.highScoreManager = new HighScoreManager();
-        setLayout(new GridLayout(4, 1));
+        setLayout(new GridLayout(5, 1));
 
-        JLabel gameOverLabel = new JLabel("Game Over!", SwingConstants.CENTER);
+        JLabel gameOverLabel = new JLabel("Meghaltál!", SwingConstants.CENTER);
         gameOverLabel.setFont(new Font("Serif", Font.BOLD, 36));
         add(gameOverLabel);
 
-        JLabel scoreLabel = new JLabel("Your Score: " + score, SwingConstants.CENTER);
+        JLabel scoreLabel = new JLabel("Pontszámod: " + score, SwingConstants.CENTER);
         scoreLabel.setFont(new Font("Serif", Font.BOLD, 24));
         add(scoreLabel);
 
+        JLabel waveLabel = new JLabel("Legnagyobb tisztított hullám: " + maxWave, SwingConstants.CENTER);
+        waveLabel.setFont(new Font("Serif", Font.BOLD, 24));
+        add(waveLabel);
+
         JPanel saveScorePanel = new JPanel(new BorderLayout());
         JTextField nameField = new JTextField();
-        JButton saveButton = new JButton("Save Score");
+        JButton saveButton = new JButton("Tudasd mindenkivel, hogy mennyire kemény vagy!");
         saveButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String name = nameField.getText();
                 if (!name.isEmpty()) {
-                    highScoreManager.addHighScore(name, score);
-                    JOptionPane.showMessageDialog(frame, "Score saved!");
+                    highScoreManager.addHighScore(name, score, maxWave);
+                    JOptionPane.showMessageDialog(frame, "Pontszám elmentve!");
                 }
             }
         });
@@ -47,7 +49,16 @@ public class EndScreen extends JPanel {
         saveScorePanel.add(saveButton, BorderLayout.EAST);
         add(saveScorePanel);
 
-        JButton mainMenuButton = new JButton("Main Menu");
+        JButton retryButton = new JButton("Sose adom fel!");
+        retryButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                restartGame();
+            }
+        });
+        add(retryButton);
+
+        JButton mainMenuButton = new JButton("Vissza a főmenübe");
         mainMenuButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -55,6 +66,20 @@ public class EndScreen extends JPanel {
             }
         });
         add(mainMenuButton);
+    }
+
+    private void restartGame() {
+        frame.getContentPane().removeAll();
+        Game game = new Game(selectedMusic, selectedPlayerSkin, selectedGunSkin, difficulty);
+        game.setFrame(frame);
+        frame.add(game);
+        frame.revalidate();
+        frame.repaint();
+
+        game.requestFocusInWindow();
+
+        Thread gameThread = new Thread(game);
+        gameThread.start();
     }
 
     private void backToMainMenu() {

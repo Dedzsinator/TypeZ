@@ -11,8 +11,8 @@ public class HighScoreManager {
         loadHighScores();
     }
 
-    public void addHighScore(String name, int score) {
-        highScores.add(new HighScore(name, score));
+    public void addHighScore(String name, int score, int maxWave) {
+        highScores.add(new HighScore(name, score, maxWave));
         saveHighScores();
     }
 
@@ -20,11 +20,11 @@ public class HighScoreManager {
         return highScores;
     }
 
+    @SuppressWarnings("unchecked")
     private void loadHighScores() {
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(HIGH_SCORE_FILE))) {
             highScores = (Set<HighScore>) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
-            // If the file doesn't exist or can't be read, start with an empty set
             highScores = new HashSet<>();
         }
     }
@@ -40,10 +40,12 @@ public class HighScoreManager {
     public static class HighScore implements Serializable {
         private String name;
         private int score;
+        private int maxWave;
 
-        public HighScore(String name, int score) {
+        public HighScore(String name, int score, int maxWave) {
             this.name = name;
             this.score = score;
+            this.maxWave = maxWave;
         }
 
         public String getName() {
@@ -54,9 +56,13 @@ public class HighScoreManager {
             return score;
         }
 
+        public int getMaxWave() {
+            return maxWave;
+        }
+
         @Override
         public int hashCode() {
-            return name.hashCode() + score;
+            return name.hashCode() + score + maxWave;
         }
 
         @Override
@@ -64,7 +70,7 @@ public class HighScoreManager {
             if (this == obj) return true;
             if (obj == null || getClass() != obj.getClass()) return false;
             HighScore that = (HighScore) obj;
-            return score == that.score && name.equals(that.name);
+            return score == that.score && maxWave == that.maxWave && name.equals(that.name);
         }
     }
 }

@@ -36,7 +36,7 @@ public class WordLoader {
             }
         }
         if (filteredWords.isEmpty()) {
-            return new Word("default", 1); // Return a default word if no words match the criteria
+            return new Word("default", 1);
         }
         return filteredWords.get(random.nextInt(filteredWords.size()));
     }

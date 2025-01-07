@@ -2,11 +2,11 @@ public class ZombieObserver implements Observer {
     @Override
     public void update(String event) {
         if (event.equals("ZOMBIE_KILLED")) {
-            System.out.println("A zombie was killed!");
+            System.out.println("Halott zombi!");
         } else if (event.equals("GAME_OVER")) {
-            System.out.println("Game over! Zombies win.");
+            System.out.println("Jatek vege, zombik nyertek.");
         } else {
-            System.out.println(event); // Display the current wave's zombie types
+            System.out.println(event);
         }
     }
 }

@@ -1,50 +1,45 @@
-import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.Color;
+import javax.imageio.ImageIO;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import javax.imageio.ImageIO;
-import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Player {
     private int x, y;
-    //private String skin;
+    private String skin;
+    private String gunSkin;
+    private Image gunImage;
     private Animation playerAnimation;
     private Animation gunFireAnimation;
-    private Image gunImage;
-    private double gunAngle;
     private int gunRecoil;
+    private double gunAngle;
 
-    public Player(int x, int y, String skin) {
+    public Player(int x, int y, String skin, String gunSkin) {
         this.x = x;
         this.y = y;
-        //this.skin = skin;
-        this.gunAngle = 0;
+        this.skin = skin;
+        this.gunSkin = gunSkin;
+        this.gunImage = loadGunImage(gunSkin);
+        this.playerAnimation = new Animation(100);
+        this.gunFireAnimation = new Animation(50);
         this.gunRecoil = 0;
+        this.gunAngle = 0;
 
-        // Load player animation frames
-        playerAnimation = new Animation(100); // Example frame duration
         List<Image> playerFrames = loadFramesFromDirectory("../res/player/" + skin + "/");
         for (Image frame : playerFrames) {
             playerAnimation.addFrame(frame);
         }
 
-        // Load gun fire animation frames
-        gunFireAnimation = new Animation(50); // Example frame duration
-        List<Image> gunFireFrames = loadFramesFromDirectory("../res/misc/");
+        List<Image> gunFireFrames = loadFramesFromDirectory("../res/misc/gunfire/");
         for (Image frame : gunFireFrames) {
             gunFireAnimation.addFrame(frame);
         }
-        gunFireAnimation.setLoop(false); // Gun fire animation should not loop
+        gunFireAnimation.setLoop(false);
+    }
 
-        // Load gun image
-        try {
-            gunImage = ImageIO.read(new File("../res/guns/g1.png")); // Adjust the path as needed
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    private Image loadGunImage(String gunSkin) {
+        return (Image) ResourceLoader.loadRes("../res/guns/" + gunSkin + ".png");
     }
 
     private List<Image> loadFramesFromDirectory(String directoryPath) {
@@ -81,10 +76,8 @@ public class Player {
                 gunFireAnimation.update();
                 Image gunFireFrame = gunFireAnimation.getCurrentFrame();
                 if (gunFireFrame != null) {
-                    // Calculate the tip of the gun
-                    int gunTipX = (int) (x + 25 + Math.cos(Math.toRadians(gunAngle)) * 32);
-                    int gunTipY = (int) (y + 25 + Math.sin(Math.toRadians(gunAngle)) * 32);
-                    // Adjust the position of the gun fire animation here
+                    int gunTipX = (int) (x + 25 + Math.cos(Math.toRadians(gunAngle)) + 30);
+                    int gunTipY = (int) (y + 25 + Math.sin(Math.toRadians(gunAngle)));
                     g2d.drawImage(gunFireFrame, gunTipX - gunFireFrame.getWidth(null) / 2, gunTipY - gunFireFrame.getHeight(null) / 2, null);
                 }
             }
@@ -96,8 +89,8 @@ public class Player {
     }
 
     public void shoot() {
-        gunRecoil = -10; // Recoil effect
-        gunFireAnimation.reset(); // Reset gun fire animation
+        gunRecoil = -10;
+        gunFireAnimation.reset();
     }
 
     public void update() {

@@ -23,7 +23,7 @@ public class Animation {
 
     public void update() {
         if (frames.isEmpty()) {
-            return; // No frames to update
+            return;
         }
         long currentTime = System.currentTimeMillis();
         if (currentTime - lastFrameTime >= frameDuration) {
@@ -34,7 +34,7 @@ public class Animation {
 
     public Image getCurrentFrame() {
         if (frames.isEmpty()) {
-            return null; // No frames to display
+            return null;
         }
         return frames.get(currentFrame);
     }

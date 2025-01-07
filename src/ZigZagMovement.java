@@ -1,7 +1,7 @@
 public class ZigZagMovement implements MovementStrategy {
     private boolean movingRight = true;
-    private static final int ZIGZAG_SPEED = 5; // Speed of horizontal movement
-    private static final int ZIGZAG_DISTANCE = 800; // Width of the screen
+    private static final int ZIGZAG_SPEED = 5;
+    private static final int ZIGZAG_DISTANCE = 800;
 
     @Override
     public void move(Zombie zombie) {
@@ -14,7 +14,6 @@ public class ZigZagMovement implements MovementStrategy {
 
         zombie.setX(targetX);
 
-        // Move forward towards the target
         zombie.moveTowards(zombie.getTargetX(), zombie.getTargetY());
     }
 }
